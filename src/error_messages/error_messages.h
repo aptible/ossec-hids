@@ -88,6 +88,9 @@
 #define INVALID_TIME    "%s(1240): ERROR: Invalid time format: '%s'."
 #define INVALID_DAY     "%s(1241): ERROR: Invalid day format: '%s'."
 
+#define SEND_DISCON     "%s(1245): ERROR: Sending message to disconnected agent '%s'."
+#define SHARED_ERROR    "%s(1246): ERROR: Unable to send file '%s' to agent '%s' (%s)."
+
 #define MAILQ_ERROR     "%s(1221): ERROR: No Mail queue at %s"
 #define IMSG_ERROR      "%s(1222): ERROR: Invalid msg: %s"
 #define SNDMAIL_ERROR   "%s(1223): ERROR: Error Sending email to %s (smtp server)"
