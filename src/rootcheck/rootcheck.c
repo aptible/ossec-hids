@@ -82,6 +82,7 @@ int rootcheck_init(int test_config)
     rootcheck.skip_nfs = 0;
     rootcheck.alert_msg = NULL;
     rootcheck.time = ROOTCHECK_WAIT;
+    rootcheck.tsleep = 0;
 
     rootcheck.checks.rc_dev = 1;
     rootcheck.checks.rc_files = 1;
@@ -194,6 +195,8 @@ int rootcheck_init(int test_config)
     if (rootcheck.workdir == NULL) {
         rootcheck.workdir = DEFAULTDIR;
     }
+
+    rootcheck.tsleep = (unsigned int) getDefine_Int("rootcheck", "sleep", 0, 64);
 
 #ifdef OSSECHIDS
     /* Start up message */
