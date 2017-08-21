@@ -8,8 +8,8 @@ Homepage: http://www.ossec.net
 
 Package: ossec-hids-agent
 Architecture: any
-Depends: ${shlibs:Depends}, libc6 (>= 2.7), libssl1.0.0, expect, debconf
+Depends: ${shlibs:Depends}, ${misc:Depends}, libc6 (>= 2.7), libssl1.0.0, expect, debconf, cgroup-bin
 Conflicts: ossec-hids
 Description: OSSEC Agent - Host Based Intrusion Detection System
  OSSEC HIDS for log analysis, integrity checking, rootkits detection and
- active response. This package includes the server and the agent.
+ active response. This package includes the agent only.

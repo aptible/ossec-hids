@@ -13,17 +13,40 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+# This should be configurable
+export PACKAGE=ossec-hids
+export TARGET=hybrid
+
+# This should be kept in sync across packages
+export DESTDIR=$(CURDIR)/debian/$(PACKAGE)
+export PREFIX=/var/ossec
+
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
-
 %:
-	dh $@ 
+	dh $@
 
 override_dh_auto_configure:
 
+
 override_dh_auto_build:
-	$(MAKE) all
+	$(MAKE) -C src build
+
+override_dh_auto_install:
+	$(MAKE) -C src install
+	mkdir -p `dirname $(DESTDIR)/$(PREFIX)`
+	mv $(PREFIX) $(DESTDIR)/$(PREFIX)
+	
+	mkdir -p "$(DESTDIR)/etc"
+	echo "DIRECTORY=\"/var/ossec\"" > $(DESTDIR)/etc/ossec-init.conf
+	echo "VERSION=\"`dpkg-parsechangelog --show-field Version`\"" >> $(DESTDIR)/etc/ossec-init.conf
+	echo "DATE=\"`date`\"" >> $(DESTDIR)/etc/ossec-init.conf
+	echo "TYPE=\"$(TARGET)\"" >> $(DESTDIR)/etc/ossec-init.conf
+	
+	mkdir -p "$(DESTDIR)/etc/init.d"
+	cp -p src/init/ossec-hids-debian.init $(DESTDIR)/etc/init.d/ossec
 
 override_dh_auto_clean:
-	$(MAKE) clean
+	$(MAKE) -C src clean
+	rm  src/external/zlib-1.2.8/Makefile src/external/zlib-1.2.8/zconf.h

@@ -1,151 +1,129 @@
 #!/bin/sh
-# postinst script for ossec-hids
+# postinst script for ossec-hids-agent
 # Santiago Bassett <santiago.bassett@gmail.com>
 # 03/25/2014
 
 set -e
 
 case "$1" in
-    configure)
+  configure)
 
-	DIR="/var/ossec/"
-	USER="ossec"
-	GROUP="ossec"
-	OSSEC_HIDS_TMP_DIR="/tmp/ossec-hids"
+    DIR="/var/ossec/"
+    USER="ossec"
+    GROUP="ossec"
+    OSSEC_HIDS_TMP_DIR="/tmp/ossec-hids"
 
-	OSMYSHELL="/sbin/nologin"
-        if [ ! -f ${OSMYSHELL} ]; then 
-	    if [ -f "/bin/false" ]; then
-	        OSMYSHELL="/bin/false"
-	    fi
-	fi
+    OSMYSHELL="/sbin/nologin"
+    if [ ! -f ${OSMYSHELL} ]; then 
+      if [ -f "/bin/false" ]; then
+        OSMYSHELL="/bin/false"
+      fi
+    fi
 
-        if ! getent group | grep -q "^ossec"
-        then
-            addgroup --system ossec
-        fi
-        if ! getent passwd | grep -q "^ossec"
-        then
-            adduser --system --home ${DIR} --shell ${OSMYSHELL} --ingroup ${GROUP} ${USER} > /dev/null 2>&1
-        fi
+    if ! getent group | grep -q "^ossec"; then
+      addgroup --system ossec
+    fi
 
-	# Default for all directories
-	chmod -R 550 ${DIR}
-	chown -R root:${GROUP} ${DIR}
+    if ! getent passwd | grep -q "^ossec"; then
+      adduser --system --home ${DIR} --shell ${OSMYSHELL} --ingroup ${GROUP} ${USER} > /dev/null 2>&1
+    fi
 
-	# To the ossec queue (default for agentd to read)
-	chown -R ${USER}:${GROUP} ${DIR}/queue/ossec
-	chmod -R 770 ${DIR}/queue/ossec
+    # Default for all directories
+    chmod -R 550 "${DIR}"
+    chown -R "root:${GROUP}" "${DIR}"
 
-	# For the logging user
-	chown -R ${USER}:${GROUP} ${DIR}/logs
-	chmod -R 750 ${DIR}/logs
-	chmod -R 775 ${DIR}/queue/rids
-	touch ${DIR}/logs/ossec.log
-	chown ${USER}:${GROUP} ${DIR}/logs/ossec.log
-	chmod 664 ${DIR}/logs/ossec.log
+    # To the ossec queue (default for agentd to read)
+    chown -R "${USER}:${GROUP}" "${DIR}/queue/ossec"
+    chmod -R 770 "${DIR}/queue/ossec"
 
-        chown -R ${USER}:${GROUP} ${DIR}/queue/diff
-        chmod -R 750 ${DIR}/queue/diff
-        chmod 740 ${DIR}/queue/diff/* > /dev/null 2>&1 || true
+    # For the logging user
+    chown -R "${USER}:${GROUP}" "${DIR}/logs"
+    chmod -R 750 "${DIR}/logs"
+    chmod -R 775 "${DIR}/queue/rids"
+    touch "${DIR}/logs/ossec.log"
+    chown "${USER}:${GROUP}" "${DIR}/logs/ossec.log"
+    chmod 664 "${DIR}/logs/ossec.log"
 
-	# For the etc dir
-	chmod 550 ${DIR}/etc
-	chown -R root:${GROUP} ${DIR}/etc
-	if [ -f /etc/localtime ]; then
-	    cp -pL /etc/localtime ${DIR}/etc/;
-	    chmod 555 ${DIR}/etc/localtime
-	    chown root:${GROUP} ${DIR}/etc/localtime
-	fi
+    chown -R "${USER}:${GROUP}" "${DIR}/queue/diff"
+    chmod -R 750 "${DIR}/queue/diff"
+    chmod 740 "${DIR}/queue/diff/"* > /dev/null 2>&1 || true
 
-	if [ -f /etc/TIMEZONE ]; then
-	    cp -p /etc/TIMEZONE ${DIR}/etc/;
-	    chmod 555 ${DIR}/etc/TIMEZONE
-	fi
+    # For the etc dir
+    chmod 550 "${DIR}/etc"
+    chown -R "root:${GROUP}" "${DIR}/etc"
 
-	# More files
-	chown root:${GROUP} ${DIR}/etc/internal_options.conf
-	chown root:${GROUP} ${DIR}/etc/local_internal_options.conf >/dev/null 2>&1 || true
-	chown root:${GROUP} ${DIR}/etc/client.keys >/dev/null 2>&1 || true
-	chown root:${GROUP} ${DIR}/agentless/*
-	chown ${USER}:${GROUP} ${DIR}/.ssh
-	chown root:${GROUP} ${DIR}/etc/shared/*
+    if [ -f /etc/localtime ]; then
+      cp -pL /etc/localtime "${DIR}/etc/"
+      chmod 555 "${DIR}/etc/localtime"
+      chown "root:${GROUP}" "${DIR}/etc/localtime"
+    fi
 
-	chmod 550 ${DIR}/etc
-	chmod 440 ${DIR}/etc/internal_options.conf
-	chmod 660 ${DIR}/etc/local_internal_options.conf >/dev/null 2>&1 || true
-	chmod 440 ${DIR}/etc/client.keys >/dev/null 2>&1 || true
-	chmod 550 ${DIR}/agentless/*
-	chmod 700 ${DIR}/.ssh
-	chmod 770 ${DIR}/etc/shared
-	chmod 660 ${DIR}/etc/shared/*
+    if [ -f /etc/TIMEZONE ]; then
+      cp -p /etc/TIMEZONE "${DIR}/etc/"
+      chmod 555 "${DIR}/etc/TIMEZONE"
+    fi
 
-	# For the /var/run
-	chmod 770 ${DIR}/var/run
-	chown root:${GROUP} ${DIR}/var/run
+    # More files
+    chown "root:${GROUP}" "${DIR}/etc/internal_options.conf"
+    chown "root:${GROUP}" "${DIR}/etc/local_internal_options.conf" >/dev/null 2>&1 || true
+    chown "root:${GROUP}" "${DIR}/etc/client.keys" >/dev/null 2>&1 || true
+    chown "root:${GROUP}" "${DIR}/agentless/"*
+    chown "${USER}:${GROUP}" "${DIR}/.ssh"
+    chown "root:${GROUP}" "${DIR}/etc/shared/"*
 
-	# For util.sh 
-	chown root:${GROUP} ${DIR}/bin/util.sh
-	chmod +x ${DIR}/bin/util.sh
+    chmod 550 "${DIR}/etc"
+    chmod 440 "${DIR}/etc/internal_options.conf"
+    chmod 660 "${DIR}/etc/local_internal_options.conf" >/dev/null 2>&1 || true
+    chmod 440 "${DIR}/etc/client.keys" >/dev/null 2>&1 || true
+    chmod 550 "${DIR}/agentless/"*
+    chmod 700 "${DIR}/.ssh"
+    chmod 770 "${DIR}/etc/shared"
+    chmod 660 "${DIR}/etc/shared/"*
 
-	# For binaries and active response
-        chmod 755 ${DIR}/active-response/bin/*
-        chown root:${GROUP} ${DIR}/active-response/bin/*
-        chown root:${GROUP} ${DIR}/bin/*
-        chmod 550 ${DIR}/bin/*
+    # For the /var/run
+    chmod 770 "${DIR}/var/run"
+    chown "root:${GROUP}" "${DIR}/var/run"
 
-	# For ossec.conf
-        chown root:${GROUP} ${DIR}/etc/ossec.conf
-        chmod 660 ${DIR}/etc/ossec.conf
+    # For util.sh
+    chown "root:${GROUP}" "${DIR}/bin/util.sh"
+    chmod +x "${DIR}/bin/util.sh"
 
-	# Debconf
-	. /usr/share/debconf/confmodule
-	db_input high ossec-hids-agent/server-ip || true
-	db_go
+    # For binaries and active response
+    chmod 755 "${DIR}/active-response/bin/"*
+    chown "root:${GROUP}" "${DIR}/active-response/bin/"*
+    chown "root:${GROUP}" "${DIR}/bin/"*
+    chmod 550 "${DIR}/bin/"*
 
-	db_get ossec-hids-agent/server-ip
-	SERVER_IP=$RET
+    # For ossec.conf
+    chown "root:${GROUP}" "${DIR}/etc/ossec.conf"
+    chmod 660 "${DIR}/etc/ossec.conf"
 
-	sed -i "s/<server-ip>[^<]\+<\/server-ip>/<server-ip>${SERVER_IP}<\/server-ip>/" ${DIR}/etc/ossec.conf
-	db_stop
+    # ossec-init.conf
+    if [ -e ${DIR}/etc/ossec-init.conf ] && [ -d /etc/ ]; then
+      if [ -e /etc/ossec-init.conf ]; then
+        rm -f /etc/ossec-init.conf
+      fi
 
-        # ossec-init.conf
-        if [ -e ${DIR}/etc/ossec-init.conf ] && [ -d /etc/ ]; then
-            if [ -e /etc/ossec-init.conf ]; then
-                rm -f /etc/ossec-init.conf
-            fi
-            ln -s ${DIR}/etc/ossec-init.conf /etc/ossec-init.conf
-        fi
+      ln -s ${DIR}/etc/ossec-init.conf /etc/ossec-init.conf
+    fi
 
-        # init.d/ossec file
-        if [ -x ${DIR}/etc/init.d/ossec ] && [ -d /etc/init.d/ ]; then
-            if [ -e /etc/init.d/ossec ]; then
-                rm -f /etc/init.d/ossec
-            fi
-            ln -s ${DIR}/etc/init.d/ossec /etc/init.d/ossec
-        fi
+    # Service
+    update-rc.d -f ossec defaults
 
-	# Service
-	if [ -x /etc/init.d/ossec ]; then
-	    update-rc.d -f ossec defaults
-	fi
-
-	# Delete tmp directory
-	if [ -d ${OSSEC_HIDS_TMP_DIR} ]; then
-	    rm -r ${OSSEC_HIDS_TMP_DIR}
-	fi
-    
+    # Delete tmp directory
+    if [ -d "${OSSEC_HIDS_TMP_DIR}" ]; then
+      rm -r "${OSSEC_HIDS_TMP_DIR}"
+    fi
     ;;
 
 
-    abort-upgrade|abort-remove|abort-deconfigure)
-
+  abort-upgrade|abort-remove|abort-deconfigure)
     ;;
 
 
-    *)
-        echo "postinst called with unknown argument \`$1'" >22
-        exit 1
+  *)
+    echo "postinst called with unknown argument '$1'" >&2
+    exit 1
     ;;
 
 esac
