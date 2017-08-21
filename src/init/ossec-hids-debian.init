@@ -21,8 +21,20 @@ if [ "X${DIRECTORY}" = "X" ]; then
     DIRECTORY="/var/ossec"
 fi
 
+CGROUP="ossec"
+CGROUP_DESCRIPTOR="cpu,cpuacct,memory,blkio:${CGROUP}"
+
 start() {
-    ${DIRECTORY}/bin/ossec-control start
+    cgcreate -g "$CGROUP_DESCRIPTOR"
+
+    # 1 GB
+    echo 1073741824 > "/sys/fs/cgroup/memory/${CGROUP}/memory.limit_in_bytes"
+
+    # 1/8 th of a core
+    echo 12500 > "/sys/fs/cgroup/cpu/${CGROUP}/cpu.cfs_quota_us"
+    echo 100000 > "/sys/fs/cgroup/cpu/${CGROUP}/cpu.cfs_period_us"
+
+    cgexec -g "$CGROUP_DESCRIPTOR" -- ${DIRECTORY}/bin/ossec-control start
 }
 
 stop() {
