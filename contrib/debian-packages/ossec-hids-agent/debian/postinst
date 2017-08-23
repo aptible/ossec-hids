@@ -109,11 +109,8 @@ case "$1" in
 
     # Service
     update-rc.d -f ossec defaults
+    service ossec start
 
-    # Delete tmp directory
-    if [ -d "${OSSEC_HIDS_TMP_DIR}" ]; then
-      rm -r "${OSSEC_HIDS_TMP_DIR}"
-    fi
     ;;
 
 

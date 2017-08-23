@@ -11,10 +11,9 @@ case "$1" in
     USER_MAIL="ossecm"
     USER_REM="ossecr"
     GROUP="ossec"
-    OSSEC_HIDS_TMP_DIR="/tmp/ossec-hids"
 
     OSMYSHELL="/sbin/nologin"
-    if [ ! -f ${OSMYSHELL} ]; then 
+    if [ ! -f ${OSMYSHELL} ]; then
       if [ -f "/bin/false" ]; then
         OSMYSHELL="/bin/false"
       fi
@@ -110,9 +109,6 @@ case "$1" in
     chmod 770 "${DIR}/var/run"
     chown "root:${GROUP}" "${DIR}/var/run"
 
-    # TODO: drop all local_X files in conffiles
-    # TODO: drop sharted agent config in conffiles
-
     # More files
     chown "root:${GROUP}" "${DIR}/etc/decoder.xml"
     chown "root:${GROUP}" "${DIR}/etc/local_decoder.xml" >/dev/null 2>&1 || true
@@ -146,7 +142,7 @@ case "$1" in
 
     # Service
     update-rc.d -f ossec defaults
-
+    service ossec start
     ;;
 
 
