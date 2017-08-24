@@ -19,12 +19,12 @@ case "$1" in
       fi
     fi
 
-    if ! getent group | grep -q "^ossec"; then
-      addgroup --system ossec
+    if ! getent group | grep -q "^${GROUP}:"; then
+      addgroup --system "$GROUP"
     fi
 
-    if ! getent passwd | grep -q "^ossec"; then
-      adduser --system --home ${DIR} --shell ${OSMYSHELL} --ingroup ${GROUP} ${USER} > /dev/null 2>&1
+    if ! getent passwd | grep -q "^${USER}:"; then
+      adduser --system --home "${DIR}" --shell "${OSMYSHELL}" --ingroup "${GROUP}" "${USER}" > /dev/null 2>&1
     fi
 
     # Default for all directories
