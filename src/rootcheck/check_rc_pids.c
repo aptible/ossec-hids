@@ -256,12 +256,15 @@ static void loop_all_pids(const char *ps, pid_t max_pid, int *_errors, int *_tot
                    _proc_stat != _kill1) {
             /* Check if the pid is a thread (not showing in /proc */
             if (!noproc && !check_rc_readproc((int)i)) {
-                char op_msg[OS_SIZE_1024 + 1];
+                /* Check for a race */
+                if (_proc_stat == proc_stat(i) || _proc_read == proc_read(i) || _proc_chdir == proc_chdir(i)) {
+                    char op_msg[OS_SIZE_1024 + 1];
 
-                snprintf(op_msg, OS_SIZE_1024, "Process '%d' hidden from "
-                         "/proc. Possible kernel level rootkit.", (int)i);
-                notify_rk(ALERT_ROOTKIT_FOUND, op_msg);
-                (*_errors)++;
+                    snprintf(op_msg, OS_SIZE_1024, "Process '%d' hidden from "
+                             "/proc. Possible kernel level rootkit.", (int)i);
+                    notify_rk(ALERT_ROOTKIT_FOUND, op_msg);
+                    (*_errors)++;
+                }
             }
         } else if (_gsid1 && _kill1 && !_ps0) {
             /* checking if the pid is a thread (not showing on ps */
