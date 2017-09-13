@@ -257,7 +257,7 @@ static void loop_all_pids(const char *ps, pid_t max_pid, int *_errors, int *_tot
             /* Check if the pid is a thread (not showing in /proc */
             if (!noproc && !check_rc_readproc((int)i)) {
                 /* Check for a race */
-                if (_proc_stat == proc_stat(i) || _proc_read == proc_read(i) || _proc_chdir == proc_chdir(i)) {
+                if (_proc_stat == proc_stat(i) && _proc_read == proc_read(i) && _proc_chdir == proc_chdir(i)) {
                     char op_msg[OS_SIZE_1024 + 1];
 
                     snprintf(op_msg, OS_SIZE_1024, "Process '%d' hidden from "
