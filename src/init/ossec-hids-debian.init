@@ -17,8 +17,26 @@
 ### END INIT INFO
 
 . /etc/ossec-init.conf
+
+if [ -f /etc/default/ossec ]; then
+  . /etc/default/ossec
+fi
+
 if [ "X${DIRECTORY}" = "X" ]; then
     DIRECTORY="/var/ossec"
+fi
+
+if [ "X${MEMORY_LIMIT}" = "X" ]; then
+  # 1 GB
+  MEMORY_LIMIT="1073741824"
+fi
+
+if [ "X${CPU_QUOTA}" = "X" ]; then
+  CPU_QUOTA=12500
+fi
+
+if [ "X${CPU_PERIOD}" = "X" ]; then
+  CPU_PERIOD="100000"
 fi
 
 CGROUP="ossec"
@@ -27,12 +45,9 @@ CGROUP_DESCRIPTOR="cpu,cpuacct,memory,blkio:${CGROUP}"
 start() {
     cgcreate -g "$CGROUP_DESCRIPTOR"
 
-    # 1 GB
-    echo 1073741824 > "/sys/fs/cgroup/memory/${CGROUP}/memory.limit_in_bytes"
-
-    # 1/8 th of a core
-    echo 12500 > "/sys/fs/cgroup/cpu/${CGROUP}/cpu.cfs_quota_us"
-    echo 100000 > "/sys/fs/cgroup/cpu/${CGROUP}/cpu.cfs_period_us"
+    echo "$MEMORY_LIMIT" > "/sys/fs/cgroup/memory/${CGROUP}/memory.limit_in_bytes"
+    echo "$CPU_QUOTA" > "/sys/fs/cgroup/cpu/${CGROUP}/cpu.cfs_quota_us"
+    echo "$CPU_PERIOD" > "/sys/fs/cgroup/cpu/${CGROUP}/cpu.cfs_period_us"
 
     cgexec -g "$CGROUP_DESCRIPTOR" -- ${DIRECTORY}/bin/ossec-control start
 }
