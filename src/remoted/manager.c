@@ -259,7 +259,6 @@ static void c_files()
  */
 static int send_file_toagent(unsigned int agentid, const char *name, const char *sum)
 {
-    int i = 0;
     size_t n = 0;
     char file[OS_SIZE_1024 + 1];
     char buf[OS_SIZE_1024 + 1];
@@ -290,13 +289,6 @@ static int send_file_toagent(unsigned int agentid, const char *name, const char 
             fclose(fp);
             return (-1);
         }
-
-        /* Sleep 1 every 30 messages -- no flood */
-        if (i > 30) {
-            sleep(1);
-            i = 0;
-        }
-        i++;
     }
 
     /* Send the message to close the file */
