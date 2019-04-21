@@ -29,6 +29,7 @@ int k_import(const char *cmdimport);
 int k_bulkload(const char *cmdbulk);
 
 /* Validation functions */
+int getFirstAvailableId(void);
 int OS_IsValidName(const char *u_name);
 int OS_IsValidID(const char *id);
 int IDExist(const char *id);
