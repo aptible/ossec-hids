@@ -359,19 +359,7 @@ int k_bulkload(const char *cmdbulk)
         }
 
         /* Default ID */
-        i = MAX_AGENTS + 32512;
-        snprintf(id, 8, "%03d", i);
-        while (!IDExist(id)) {
-            i--;
-            snprintf(id, 8, "%03d", i);
-
-            /* No key present, use id 0 */
-            if (i <= 0) {
-                i = 0;
-                break;
-            }
-        }
-        snprintf(id, 8, "%03d", i + 1);
+        snprintf(id, 8, "%03d", getFirstAvailableId());
 
         if (!OS_IsValidID(id)) {
             printf(INVALID_ID, id);

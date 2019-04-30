@@ -13,6 +13,75 @@
 /* Global variables */
 fpos_t fp_pos;
 
+/*Number bit of int type*/
+#define INT_BIT_SIZE          (sizeof(int)*CHAR_BIT)
+/*Enable bit at a position*/
+#define SetBit(Array,pos)     ( Array[(pos/INT_BIT_SIZE)] |= (1 << (pos%INT_BIT_SIZE)) )
+/*Check state of bit at a */
+#define TestBit(Array,pos)    ( Array[(pos/INT_BIT_SIZE)] & (1 << (pos%INT_BIT_SIZE)) )
+
+int *MapIDToBitArray()
+{
+    FILE *fp;
+    char line_read[FILE_SIZE + 1];
+    line_read[FILE_SIZE] = '\0';
+    int *arrayID;
+    int max = MAX_AGENTS;
+    if (isChroot()) {
+        fp = fopen(AUTH_FILE, "r");
+    } else {
+        fp = fopen(KEYSFILE_PATH, "r");
+    }
+
+    if (!fp) {
+        return (NULL);
+    }
+
+    os_calloc(MAX_AGENTS/INT_BIT_SIZE + 1, sizeof(int), arrayID);
+
+    while (fgets(line_read, FILE_SIZE - 1, fp) != NULL) {
+        char *name;
+
+        if (line_read[0] == '#') {
+            continue;
+        }
+
+        name = strchr(line_read, ' ');
+        if (name) {
+            *name = '\0';
+            int name_num=atoi(line_read);
+            /*Enable bit at ID already allocated*/
+            if (name_num >= 0 && name_num < max) {
+                SetBit(arrayID, (name_num));
+            }
+        }
+
+    }
+    fclose(fp);
+    return arrayID;
+}
+
+int getFirstAvailableId() {
+    int *arrayID;
+    int i;
+    arrayID=(int *)MapIDToBitArray();
+    if (arrayID != NULL) {
+        /*Find first item in bit array which is not marked as allocated*/
+        for (i=1; i<MAX_AGENTS; i++) {
+            if(!TestBit(arrayID, i)) {
+                break;
+            }
+        }
+        os_free(arrayID);
+        if (i == MAX_AGENTS) {
+            return -1;
+        }
+    }
+    else {
+        return -1;
+    }
+    return i;
+}
 
 char *OS_AddNewAgent(const char *name, const char *ip, const char *id)
 {
